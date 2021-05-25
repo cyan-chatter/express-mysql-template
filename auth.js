@@ -11,53 +11,47 @@ const secretKey = process.env.JWT_SECRET || 'TotalOverdose'
 // })
 
 const generateAuthToken = async function (){
-    const student = this
-    const token = jwt.sign({_id: student._id.toString()},secretKey)
-    student.tokens = student.tokens.concat({token})
-    await student.save()
+    const client = this
+    const token = jwt.sign({_id: client._id.toString()},secretKey)
+    client.tokens = client.tokens.concat({token})
+    //await client.save()
     return token 
 }
 
 const prepasswordsave = async function(next){
-    const student = this
-    if(student.isModified('password')){
-        student.password = await bcrypt.hash(student.password, 8)
+    const client = this
+    if(client.isModified('password')){
+        client.password = await bcrypt.hash(client.password, 8)
     }
     next()
 }
 
 const findByCredentials = async (email, password) =>{
-    const student = await Student.findOne({ email })
     
-    if(!student){
+    let client
+
+    //client = await client.findOne({ email })
+
+    if(!client){
         throw new Error('E-mail not registered')
     }
-    const isMatch = await bcrypt.compare(password, student.password)
+    const isMatch = await bcrypt.compare(password, client.password)
     
     if(!isMatch){
         throw new Error('Incorrect Password')
     }
 
-    return student
+    return client
 }
 
 
 const auth = (type)=>{
-
     return async(req, res, next)=>{
         try{ 
             const token = req.cookies.token
             const decoded = jwt.verify(token, secretKey)
             let user;
-            if(type === 'students'){
-                user = await Student.findOne({_id: decoded._id, 'tokens.token':token})
-            }
-            else if(type === 'teachers'){
-                user = await Teacher.findOne({_id: decoded._id, 'tokens.token':token})
-            }
-            else if(type === 'admins'){
-                user = await Admin.findOne({_id: decoded._id, 'tokens.token':token})
-            } 
+            //user = await client.findOne({_id: decoded._id, 'tokens.token':token}) 
             if (!user) {
             throw new Error()
             }
@@ -65,16 +59,11 @@ const auth = (type)=>{
         req.user = user
         req.user_type= type
         next()
-    
         }catch(e){
-            
-            res.clearCookie('token','stream','test')
-
-            res.status(401).render('error404',{
+            res.clearCookie('token')
+            res.status(401).send({
                 status:'401 :(',
-                message: 'Please Authenticate Properly',
-                goto: '/',
-                destination: 'Home Page'
+                message: 'Please Authenticate Properly'
              })
         }
     }
