@@ -1,0 +1,19 @@
+{
+  "name": "online-voting-server",
+  "version": "1.0.0",
+  "description": "An api to conduct voting online ",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sayan Chatterjee",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.7",
+    "path": "^0.12.7"
+  }
+}
